@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+set -x
+
+ROOT=`git rev-parse --show-toplevel`
+
+docker run -d \
+-e BUILDKITE_AGENT_TOKEN
+-e BUILDKITE_AGENT_NAME=`hostname` \
+-e BUILDKITE_BUILD_PATH="/scratch/buildkite/builds" \
+-v "/scratch/buildkite/builds:/scratch/buildkite/builds:rw" \
+-v "$ROOT/agent/buildkite-hooks:/buildkite/hooks:ro" \
+-v "$ROOT/agent/buildkite-secrets:/buildkite/secrets:ro" \
+-v /var/run/docker.sock:/var/run/docker.sock \
+--name "buildkite" \
+buildkite/agent
