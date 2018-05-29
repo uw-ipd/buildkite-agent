@@ -1,7 +1,9 @@
 version: '2.2'
 services:
   buildkite:
-    image: "buildkite/agent"
+    build:
+      context: .
+      dockerfile: buildkite-agent/Dockerfile
     volumes:
      - ./buildkite-secrets:/buildkite/secrets:ro
      - ./buildkite-hooks:/buildkite/hooks:ro
