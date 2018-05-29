@@ -5,6 +5,7 @@ services:
       context: .
       dockerfile: buildkite-agent/Dockerfile
     volumes:
+     - buildkite:/buildkite
      - ./buildkite-secrets:/buildkite/secrets:ro
      - ./buildkite-hooks:/buildkite/hooks:ro
      - /scratch/buildkite/builds:/scratch/buildkite/builds:rw
@@ -13,3 +14,6 @@ services:
      - BUILDKITE_AGENT_TOKEN
      - BUILDKITE_AGENT_NAME=${HOSTNAME}
      - BUILDKITE_BUILD_PATH=/scratch/buildkite/builds
+volumes:
+  buildkite:
+    external: True
