@@ -1,6 +1,6 @@
 # Host
 
-A standard docker installation is required to run the buildkite agent. A daemonized agent is launched via [`run`](./run) and stopped via [`stop`](./stop). 
+A standard docker installation is required to run the buildkite agent. A daemonized agent is launched via [`up -d --build`](./up) and stopped via [`down`](./down). 
 
 ## Build Steps
 

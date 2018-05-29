@@ -1,0 +1,13 @@
+version: '2.2'
+services:
+  buildkite:
+    image: "buildkite/agent"
+    volumes:
+     - ./buildkite-secrets:/buildkite/secrets:ro
+     - ./buildkite-hooks:/buildkite/hooks:ro
+     - /scratch/buildkite/builds:/scratch/buildkite/builds:rw
+     - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+     - BUILDKITE_AGENT_TOKEN
+     - BUILDKITE_AGENT_NAME=${HOSTNAME}
+     - BUILDKITE_BUILD_PATH=/scratch/buildkite/builds

@@ -1,0 +1,2 @@
+#!/bin/bash
+COMPOSE_OPTIONS="-e HOSTNAME=`hostname`" bin/docker-compose up $*
