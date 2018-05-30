@@ -12,7 +12,8 @@ services:
      - /var/run/docker.sock:/var/run/docker.sock
     environment:
      - BUILDKITE_AGENT_TOKEN
-     - BUILDKITE_AGENT_NAME=${HOSTNAME}
+     - BUILDKITE_AGENT_NAME=${HOST}
+     - BUILDKITE_AGENT_TAGS="queue=default,host=${HOST},docker=${DOCKER_VERSION},nvidia_docker=${NVIDIA_DOCKER_VERSION},nvidia_device=${NVIDIA_DEVICE}"
      - BUILDKITE_BUILD_PATH=/scratch/buildkite/builds
 volumes:
   buildkite:

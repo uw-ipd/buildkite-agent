@@ -1,3 +1,21 @@
 #!/bin/bash
+
+### Setup shared docker volume
 docker volume create buildkite
-COMPOSE_OPTIONS="-e HOSTNAME=`hostname`" bin/docker-compose up $*
+
+ENV_SECRETS=`cat buildkite-secrets/docker-compose-env`
+HOST=`hostname`
+DOCKER_VERSION=`docker version --format "{{.Server.Version}}"`
+NVIDIA_DOCKER_VERSION=`nvidia-docker version | grep "NVIDIA Docker:" | sed -e "s/NVIDIA Docker: //"`
+NVIDIA_DEVICE=`nvidia-docker run --rm nvidia/cuda nvidia-smi --query-gpu=name -i 0 --format=csv,noheader | sed -e 's/ /_/g'`
+
+### Setup runtime environment
+cat > .env <<ENV 
+HOST=${HOST}
+DOCKER_VERSION=${DOCKER_VERSION}
+NVIDIA_DOCKER_VERSION=${NVIDIA_DOCKER_VERSION}
+NVIDIA_DEVICE=${NVIDIA_DEVICE}
+${ENV_SECRETS}
+ENV
+
+bin/docker-compose up $*
