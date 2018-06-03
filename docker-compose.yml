@@ -13,6 +13,8 @@ services:
      - BUILDKITE_AGENT_TOKEN
      - BUILDKITE_AGENT_NAME=${HOST}
      - BUILDKITE_AGENT_TAGS="queue=default,host=${HOST},docker=${DOCKER_VERSION},nvidia_docker=${NVIDIA_DOCKER_VERSION},nvidia_device=${NVIDIA_DEVICE}"
+     - CUDA_DEVICE_ORDER=PCI_BUS_ID
+     - CUDA_VISIBLE_DEVICES=1
 volumes:
   buildkite:
     external: True
