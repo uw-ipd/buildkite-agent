@@ -1,4 +1,4 @@
-version: '2.2'
+version: '2.3'
 services:
   buildkite:
     build:
@@ -8,13 +8,11 @@ services:
      - buildkite:/buildkite
      - ./buildkite-secrets:/buildkite/secrets:ro
      - ./buildkite-hooks:/buildkite/hooks:ro
-     - /scratch/buildkite/builds:/scratch/buildkite/builds:rw
      - /var/run/docker.sock:/var/run/docker.sock
     environment:
      - BUILDKITE_AGENT_TOKEN
      - BUILDKITE_AGENT_NAME=${HOST}
      - BUILDKITE_AGENT_TAGS="queue=default,host=${HOST},docker=${DOCKER_VERSION},nvidia_docker=${NVIDIA_DOCKER_VERSION},nvidia_device=${NVIDIA_DEVICE}"
-     - BUILDKITE_BUILD_PATH=/scratch/buildkite/builds
 volumes:
   buildkite:
     external: True
