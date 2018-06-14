@@ -4,20 +4,21 @@ RUN apk add --no-cache \
       bash \
       git \
       perl \
+      python3 \
       rsync \
       openssh-client \
       curl \
       docker \
       jq \
       su-exec \
-      py-pip \
+      py3-pip \
       libc6-compat \
       run-parts \
       tini \
       tzdata \
     && \
-    pip install --upgrade pip && \
-    pip install docker-compose
+    pip3 install --upgrade pip && \
+    pip3 install docker-compose
 
 ENV BUILDKITE_BUILD_PATH=/buildkite/builds \
     BUILDKITE_HOOKS_PATH=/buildkite/hooks \
@@ -45,6 +46,11 @@ RUN curl -L https://github.com/buildkite/agent/releases/download/v3.2.0/buildkit
 RUN curl -Lfs -o /usr/local/bin/buildkite-agent-entrypoint \
       https://raw.githubusercontent.com/buildkite/agent/v3.2.0/packaging/docker/alpine-linux/entrypoint.sh && \
     chmod +x /usr/local/bin/buildkite-agent-entrypoint
+
+RUN apk add --no-cache py3-cryptography py3-jwt py3-click py3-requests && \
+    pip3 install git+https://github.com/uw-ipd/git-credential-github-app-auth@master#egg=git_credential_github_app_auth && \
+    git config --global credential.helper github-app-auth && \
+    git config --global credential.UseHttpPath true
 
 ### Install hooks
 ADD buildkite-hooks /buildkite/hooks
