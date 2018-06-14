@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -euo pipefail
-
-ls -la /buildkite/secrets
-
-eval "$(ssh-agent -s)"
-ssh-add -k /buildkite/secrets/id_rsa

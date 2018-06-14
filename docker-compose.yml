@@ -6,15 +6,14 @@ services:
       dockerfile: buildkite-agent/Dockerfile
     volumes:
      - buildkite:/buildkite
-     - ./buildkite-secrets:/buildkite/secrets:ro
-     - ./buildkite-hooks:/buildkite/hooks:ro
+     - ./buildkite-secrets:/buildkite-secrets:ro
      - /var/run/docker.sock:/var/run/docker.sock
     environment:
      - BUILDKITE_AGENT_TOKEN
      - BUILDKITE_AGENT_NAME=${HOST}
      - BUILDKITE_AGENT_TAGS="queue=default,host=${HOST},docker=${DOCKER_VERSION},nvidia_docker=${NVIDIA_DOCKER_VERSION},nvidia_device=${NVIDIA_DEVICE}"
-     - GITHUB_APP_AUTH_ID=/buildkite/secrets/buildkite-agent.id
-     - GITHUB_APP_AUTH_KEY=/buildkite/secrets/buildkite-agent.2018-06-13.private-key.pem
+     - GITHUB_APP_AUTH_ID=/buildkite-secrets/buildkite-agent.id
+     - GITHUB_APP_AUTH_KEY=/buildkite-secrets/buildkite-agent.private-key.pem
      - CUDA_DEVICE_ORDER=PCI_BUS_ID
      - CUDA_VISIBLE_DEVICES=1
 volumes:

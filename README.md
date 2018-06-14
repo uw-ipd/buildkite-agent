@@ -13,11 +13,13 @@ custom containers via the buildkite [docker plugin](https://github.com/uw-ipd/do
 
 ## Private Repositories
 
-The buildkite agent loads an ssh private key under
-[`buildkite-secrets`](./buildkite-secrets). To enable support for private repos
-add the matching [`id_rsa.pub`](./buildkite-secrets/id_rsa.pub) as a repository
-read-only [deploy key](https://developer.github.com/v3/guides/managing-deploy-keys/)
-to enable access to the repo.
+The buildkite agent can use github app credentials to manage access to
+private repositories via
+[`git-credential-github-app-auth`](https://github.com/uw-ipd/git-credential-github-app-auth).
+To enable private access, create a private, organization-scoped github
+application with "Repository contents" permission, copy an application
+private key to `buildkite-secrets/buildkite-agent.private-key.pem` and set
+the application id in `buildkite-secrets/buildkite-agent.id`.
 
 ## CUDA
 
