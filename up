@@ -18,4 +18,4 @@ NVIDIA_DEVICE=${NVIDIA_DEVICE}
 ${ENV_SECRETS}
 ENV
 
-bin/docker-compose up $*
+bin/docker-compose up --build $*

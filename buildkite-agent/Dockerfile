@@ -21,10 +21,10 @@ RUN apk add --no-cache \
     pip3 install docker-compose
 
 ENV BUILDKITE_BUILD_PATH=/buildkite/builds \
-    BUILDKITE_HOOKS_PATH=/buildkite/hooks \
-    BUILDKITE_PLUGINS_PATH=/buildkite/plugins
+    BUILDKITE_HOOKS_PATH=/buildkite-hooks \
+    BUILDKITE_PLUGINS_PATH=/buildkite-plugins
 
-RUN mkdir -p /buildkite/builds /buildkite/hooks /buildkite/plugins /buildkite/bin \
+RUN mkdir -p /buildkite/builds /buildkite-hooks /buildkite-plugins /buildkite/bin \
     && curl -Lfs -o /usr/local/bin/ssh-env-config.sh https://raw.githubusercontent.com/buildkite/docker-ssh-env-config/master/ssh-env-config.sh \
     && chmod +x /usr/local/bin/ssh-env-config.sh
 
@@ -51,9 +51,6 @@ RUN apk add --no-cache py3-cryptography py3-jwt py3-click py3-requests && \
     pip3 install git+https://github.com/uw-ipd/git-credential-github-app-auth@master#egg=git_credential_github_app_auth && \
     git config --global credential.helper github-app-auth && \
     git config --global credential.UseHttpPath true
-
-### Install hooks
-ADD buildkite-hooks /buildkite/hooks
 
 VOLUME /buildkite
 ENTRYPOINT ["buildkite-agent-entrypoint"]
