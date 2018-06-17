@@ -8,8 +8,28 @@ A daemonized agent is launched via [`up -d --build`](./up) and stopped via
 
 The agent runs within a minimal, `alpine`-based docker image and is likely not
 a suitable environment for any meaningful build steps. The agent has access to
-the host docker engine, and may use this engine to execute build steps within
-custom containers via the buildkite [docker plugin](https://github.com/uw-ipd/docker-buildkite-plugin). 
+the host docker engine, and may use this engine to execute build steps
+within custom containers via the buildkite [docker compose
+plugin](https://github.com/uw-ipd/docker-compose-buildkite-plugin). 
+
+The agent mounts the external `buildkite` volume at `/buildkite` and
+stores all build state on this volume by setting `BUILDKITE_BUILD_PATH` to
+`/buildkite/builds`. Ad-hoc inspection of build state can be performed via
+`docker run -it --rm -v buildkite:/buildkite ubuntu`.
+
+The `docker-compose` plugin is configured to default-mount the build
+volumes by `BUILDKITE_DOCKER_DEFALT_VOLUMES=buildkite:/buildkite`, and the
+build working directory is available for all `docker-compose` based build
+steps as `${BUILDKITE_BUILD_CHECKOUT_PATH}`. For example:
+
+```
+  - label: ':pipeline: :cat:'
+    command: cat .buildkite/pipeline.yml
+    plugins:
+      uw-ipd/docker-compose#default_volumes:
+        run: ...service name...
+        workdir: "${BUILDKITE_BUILD_CHECKOUT_PATH}"
+```
 
 ## Private Repositories
 
