@@ -11,13 +11,16 @@ services:
      - /var/run/docker.sock:/var/run/docker.sock
     environment:
      - BUILDKITE_AGENT_TOKEN
-     - BUILDKITE_AGENT_NAME=${HOST}
-     - BUILDKITE_AGENT_TAGS="queue=default,host=${HOST},docker=${DOCKER_VERSION},nvidia_docker=${NVIDIA_DOCKER_VERSION},nvidia_device=${NVIDIA_DEVICE}"
+     - BUILDKITE_AGENT_NAME=${BUILDKITE_HOST}
+     - BUILDKITE_AGENT_TAGS="queue=default,host=${BUILDKITE_HOST},docker=${DOCKER_VERSION},nvidia_docker=${NVIDIA_DOCKER_VERSION}"
      - BUILDKITE_DOCKER_DEFAULT_VOLUMES=buildkite:/buildkite
      - GITHUB_APP_AUTH_ID=/buildkite-secrets/buildkite-agent.id
      - GITHUB_APP_AUTH_KEY=/buildkite-secrets/buildkite-agent.private-key.pem
      - CUDA_DEVICE_ORDER=PCI_BUS_ID
-     - CUDA_VISIBLE_DEVICES=1
+     - CUDA_VISIBLE_DEVICES=3,4 # Reorder to default to secondary device
+  shell:
+    extends: buildkite
+    entrypoint: ["/bin/bash"]
 volumes:
   buildkite:
     external: True

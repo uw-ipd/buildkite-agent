@@ -1,21 +1,15 @@
 #!/bin/bash
+#http://redsymbol.net/articles/unofficial-bash-strict-mode/
+
+set -euo pipefail
+IFS=$'\n\t'
+
+set -x
 
 ### Setup shared docker volume
 docker volume create buildkite
 
-ENV_SECRETS=`cat buildkite-secrets/docker-compose-env`
-HOST=`hostname`
-DOCKER_VERSION=`docker version --format "{{.Server.Version}}"`
-NVIDIA_DOCKER_VERSION=`nvidia-docker version | grep "NVIDIA Docker:" | sed -e "s/NVIDIA Docker: //"`
-NVIDIA_DEVICE=`nvidia-docker run --rm nvidia/cuda nvidia-smi --query-gpu=name -i 0 --format=csv,noheader | sed -e 's/ /_/g'`
+source buildkite-secrets/docker-compose-env
+source load-env
 
-### Setup runtime environment
-cat > .env <<ENV 
-HOST=${HOST}
-DOCKER_VERSION=${DOCKER_VERSION}
-NVIDIA_DOCKER_VERSION=${NVIDIA_DOCKER_VERSION}
-NVIDIA_DEVICE=${NVIDIA_DEVICE}
-${ENV_SECRETS}
-ENV
-
-bin/docker-compose up --build $*
+docker-compose up --build $* buildkite
