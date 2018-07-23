@@ -17,7 +17,7 @@ services:
      - GITHUB_APP_AUTH_ID=/buildkite-secrets/buildkite-agent.id
      - GITHUB_APP_AUTH_KEY=/buildkite-secrets/buildkite-agent.private-key.pem
      - CUDA_DEVICE_ORDER=PCI_BUS_ID
-     - CUDA_VISIBLE_DEVICES=3,4 # Reorder to default to secondary device
+     - CUDA_VISIBLE_DEVICES=1,0 # Reorder to default to secondary device
   shell:
     extends: buildkite
     entrypoint: ["/bin/bash"]
