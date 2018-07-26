@@ -1,6 +1,6 @@
 version: '2.3'
 services:
-  agent_base:
+  default_agent:
     build:
       context: .
       dockerfile: buildkite-agent/Dockerfile
@@ -11,27 +11,32 @@ services:
      - ./buildkite-hooks:/buildkite-hooks:ro
      - /var/run/docker.sock:/var/run/docker.sock
     environment:
+     - BUILDKITE_AGENT_NAME=${BUILDKITE_HOST:?}
      - BUILDKITE_AGENT_TOKEN
-     - BUILDKITE_AGENT_TAGS=queue=${BUILDKITE_QUEUE:?},host=${BUILDKITE_HOST:?},nvidia_device=${NVIDIA_DEVICE}
      - BUILDKITE_DOCKER_DEFAULT_VOLUMES=buildkite:/buildkite
      - GITHUB_APP_AUTH_ID=/buildkite-secrets/buildkite-agent.id
      - GITHUB_APP_AUTH_KEY=/buildkite-secrets/buildkite-agent.private-key.pem
+
+  cuda_agent:
+    extends: default_agent
+    environment:
+     - BUILDKITE_AGENT_TAGS=queue=cuda,nvidia_device=${NVIDIA_DEVICE}
      - CUDA_DEVICE_ORDER=PCI_BUS_ID
 
-  agent_0:
-    extends: agent_base
+  cuda_agent_0:
+    extends: cuda_agent
     environment:
      - BUILDKITE_AGENT_NAME=0.${BUILDKITE_HOST:?}
      - CUDA_VISIBLE_DEVICES=0,1
 
-  agent_1:
-    extends: agent_base
+  cuda_agent_1:
+    extends: cuda_agent
     environment:
      - BUILDKITE_AGENT_NAME=1.${BUILDKITE_HOST:?}
      - CUDA_VISIBLE_DEVICES=1,0
 
   shell:
-    extends: agent_base
+    extends: default_agent
     entrypoint: ["/bin/bash"]
 volumes:
   buildkite:

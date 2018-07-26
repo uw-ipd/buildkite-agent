@@ -9,7 +9,12 @@ set -x
 ### Setup shared docker volume
 docker volume create buildkite
 
+### Load sekrats and environment information
 source buildkite-secrets/docker-compose-env
 source load-env
 
-docker-compose up --build $* agent_0 agent_1
+if [[ $BUILDKITE_QUEUE == "cuda" ]]; then
+  docker-compose up --build "${@}" cuda_agent_0 cuda_agent_1
+elif [[ $BUILDKITE_QUEUE == "default" ]]; then 
+  docker-compose up --build "${@}" default_agent
+fi
