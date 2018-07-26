@@ -2,5 +2,16 @@ BUILDKITE_HOST=`hostname -f`
 DOCKER_VERSION=`docker version --format "{{.Server.Version}}"`
 NVIDIA_DOCKER_VERSION=`nvidia-docker version | grep "NVIDIA Docker:" | sed -e "s/NVIDIA Docker: //"`
 
-### Skipping device listing, takes 5+ seconds to query.
-#export NVIDIA_DEVICE=`nvidia-docker run --rm nvidia/cuda nvidia-smi --query-gpu=name -i 0 --format=csv,noheader | sed -e 's/ /_/g'`
+NVIDIA_DEVICE=$(
+    set +e
+    smi_result=`nvidia-smi --query-gpu=name -i 0 --format=csv,noheader`
+    if [ $? -eq 0 ]; then
+      echo ${smi_result} | sed -e 's/ /_/g'
+    fi
+)
+
+if [[ ! -z ${NVIDIA_DEVICE} ]]; then
+  export BUILDKITE_QUEUE="cuda"
+else
+  export BUILDKITE_QUEUE="default"
+fi

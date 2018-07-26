@@ -12,4 +12,4 @@ docker volume create buildkite
 source buildkite-secrets/docker-compose-env
 source load-env
 
-docker-compose up --build $* buildkite
+docker-compose up --build $* agent_0 agent_1

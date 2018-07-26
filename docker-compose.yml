@@ -1,9 +1,10 @@
 version: '2.3'
 services:
-  buildkite:
+  agent_base:
     build:
       context: .
       dockerfile: buildkite-agent/Dockerfile
+    network_mode: "host"
     volumes:
      - buildkite:/buildkite
      - ./buildkite-secrets:/buildkite-secrets:ro
@@ -11,15 +12,26 @@ services:
      - /var/run/docker.sock:/var/run/docker.sock
     environment:
      - BUILDKITE_AGENT_TOKEN
-     - BUILDKITE_AGENT_NAME=${BUILDKITE_HOST}
-     - BUILDKITE_AGENT_TAGS="queue=default,host=${BUILDKITE_HOST},docker=${DOCKER_VERSION},nvidia_docker=${NVIDIA_DOCKER_VERSION}"
+     - BUILDKITE_AGENT_TAGS=queue=${BUILDKITE_QUEUE:?},host=${BUILDKITE_HOST:?},nvidia_device=${NVIDIA_DEVICE}
      - BUILDKITE_DOCKER_DEFAULT_VOLUMES=buildkite:/buildkite
      - GITHUB_APP_AUTH_ID=/buildkite-secrets/buildkite-agent.id
      - GITHUB_APP_AUTH_KEY=/buildkite-secrets/buildkite-agent.private-key.pem
      - CUDA_DEVICE_ORDER=PCI_BUS_ID
-     - CUDA_VISIBLE_DEVICES=1,0 # Reorder to default to secondary device
+
+  agent_0:
+    extends: agent_base
+    environment:
+     - BUILDKITE_AGENT_NAME=0.${BUILDKITE_HOST:?}
+     - CUDA_VISIBLE_DEVICES=0
+
+  agent_1:
+    extends: agent_base
+    environment:
+     - BUILDKITE_AGENT_NAME=1.${BUILDKITE_HOST:?}
+     - CUDA_VISIBLE_DEVICES=1
+
   shell:
-    extends: buildkite
+    extends: agent_base
     entrypoint: ["/bin/bash"]
 volumes:
   buildkite:
