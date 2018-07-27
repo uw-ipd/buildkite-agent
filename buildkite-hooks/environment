@@ -1,3 +1,9 @@
 #!/bin/bash
 
-set -euo pipefail
+export SSH_AUTH_SOCK=/ssh_auth_sock
+
+(
+  set +e
+  ssh-agent -a $SSH_AUTH_SOCK
+  ssh-add /buildkite-secrets/*.id_rsa
+)

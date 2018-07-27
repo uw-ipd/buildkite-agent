@@ -52,6 +52,10 @@ RUN apk add --no-cache py3-cryptography py3-jwt py3-click py3-requests && \
     git config --global credential.helper github-app-auth && \
     git config --global credential.UseHttpPath true
 
+# Disable strict host key checking and password auth for ssh
+RUN echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config && \
+    echo 'PasswordAuthentication no' >> /etc/ssh/ssh_config
+
 VOLUME /buildkite
 ENTRYPOINT ["buildkite-agent-entrypoint"]
 CMD ["start"]
