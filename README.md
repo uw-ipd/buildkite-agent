@@ -20,15 +20,27 @@ stores all build state on this volume by setting `BUILDKITE_BUILD_PATH` to
 The `docker-compose` plugin is configured to default-mount the build
 volumes by `BUILDKITE_DOCKER_DEFALT_VOLUMES=buildkite:/buildkite`, and the
 build working directory is available for all `docker-compose` based build
-steps as `${BUILDKITE_BUILD_CHECKOUT_PATH}`. For example:
+steps as `${BUILDKITE_BUILD_CHECKOUT_PATH}`.
+
+For example, `pipeline.yml`:
 
 ```
+steps:
   - label: ':pipeline: :cat:'
     command: cat .buildkite/pipeline.yml
     plugins:
-      uw-ipd/docker-compose#default_volumes:
-        run: ...service name...
-        workdir: "${BUILDKITE_BUILD_CHECKOUT_PATH}"
+      docker-compose#v2.5.1:
+        run: runner
+```
+
+and `docker-compose.yml`:
+
+```
+version: '2.3'
+services:
+  runner:
+    image: ubuntu:latest 
+    working_dir: ${BUILDKITE_BUILD_CHECKOUT_PATH}
 ```
 
 ## Private Repositories
