@@ -13,13 +13,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       rsync \
       openssh-client \
       curl \
-      docker.io \
       jq \
+      iptables \ 
+      libltdl7 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -Lfs -o /sbin/tini  https://github.com/krallin/tini/releases/download/v0.18.0/tini \
-    && chmod +x /sbin/tini \
-    && curl -Lfs https://github.com/docker/compose/releases/download/1.21.0/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose \
+    && chmod +x /sbin/tini
+
+RUN curl -O https://download.docker.com/linux/ubuntu/dists/xenial/pool/stable/amd64/docker-ce_18.06.1~ce~3-0~ubuntu_amd64.deb && \
+    dpkg -i docker-ce_18.06.1~ce~3-0~ubuntu_amd64.deb && \
+    rm docker-ce_18.06.1~ce~3-0~ubuntu_amd64.deb
+
+RUN curl -Lfs https://github.com/docker/compose/releases/download/1.21.0/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/docker-compose
 
 ### Install conda
