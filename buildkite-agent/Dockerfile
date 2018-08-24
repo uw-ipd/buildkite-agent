@@ -1,24 +1,45 @@
-FROM alpine:3.7
+FROM ubuntu:16.04
 
-RUN apk add --no-cache \
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+### Install buildkite agent deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      curl \
+      ca-certificates \
       bash \
       git \
       perl \
-      python3 \
       rsync \
       openssh-client \
       curl \
-      docker \
+      docker.io \
       jq \
-      su-exec \
-      py3-pip \
-      libc6-compat \
-      run-parts \
-      tini \
-      tzdata \
-    && \
-    pip3 install --upgrade pip && \
-    pip3 install docker-compose
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -Lfs -o /sbin/tini  https://github.com/krallin/tini/releases/download/v0.18.0/tini \
+    && chmod +x /sbin/tini \
+    && curl -Lfs https://github.com/docker/compose/releases/download/1.21.0/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose \
+    && chmod +x /usr/local/bin/docker-compose
+
+### Install conda
+ENV PATH /opt/conda/bin:$PATH
+
+RUN apt-get update --fix-missing && \
+    apt-get install -y wget bzip2 ca-certificates curl git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Updated to miniconda 4.5.1
+RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-4.5.1-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    /opt/conda/bin/conda clean -tipsy && \
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate base" >> ~/.bashrc
+
+# Install buildkite agent
 
 ENV BUILDKITE_BUILD_PATH=/buildkite/builds \
     BUILDKITE_HOOKS_PATH=/buildkite-hooks \
@@ -27,7 +48,6 @@ ENV BUILDKITE_BUILD_PATH=/buildkite/builds \
 RUN mkdir -p /buildkite/builds /buildkite-hooks /buildkite-plugins /buildkite/bin \
     && curl -Lfs -o /usr/local/bin/ssh-env-config.sh https://raw.githubusercontent.com/buildkite/docker-ssh-env-config/master/ssh-env-config.sh \
     && chmod +x /usr/local/bin/ssh-env-config.sh
-
 
 ### Install binary from github release
 # From buildkite agent source
@@ -47,14 +67,15 @@ RUN curl -Lfs -o /usr/local/bin/buildkite-agent-entrypoint \
       https://raw.githubusercontent.com/buildkite/agent/v3.2.0/packaging/docker/alpine-linux/entrypoint.sh && \
     chmod +x /usr/local/bin/buildkite-agent-entrypoint
 
-RUN apk add --no-cache py3-cryptography py3-jwt py3-click py3-requests && \
-    pip3 install git+https://github.com/uw-ipd/git-credential-github-app-auth@master#egg=git_credential_github_app_auth && \
-    git config --global credential.helper github-app-auth && \
-    git config --global credential.UseHttpPath true
-
 # Disable strict host key checking and password auth for ssh
 RUN echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config && \
     echo 'PasswordAuthentication no' >> /etc/ssh/ssh_config
+
+RUN conda install pyjwt click attrs && \
+    pip install git+https://github.com/uw-ipd/git-credential-github-app-auth@v0.2#egg=git_credential_github_app_auth && \
+    git config --global credential.helper github-app-auth && \
+    git config --global credential.UseHttpPath true
+
 
 VOLUME /buildkite
 ENTRYPOINT ["buildkite-agent-entrypoint"]
