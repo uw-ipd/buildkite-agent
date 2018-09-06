@@ -77,10 +77,14 @@ RUN curl -Lfs -o /usr/local/bin/buildkite-agent-entrypoint \
 RUN echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config && \
     echo 'PasswordAuthentication no' >> /etc/ssh/ssh_config
 
+# Install git_credential_github_app_auth, for access to private repos over https
 RUN conda install pyjwt click attrs && \
     pip install git+https://github.com/uw-ipd/git-credential-github-app-auth@v0.2#egg=git_credential_github_app_auth && \
     git config --global credential.helper github-app-auth && \
     git config --global credential.UseHttpPath true
+
+# Install conda-based curl, allowing use of '-H @file' syntax
+RUN conda install curl
 
 
 VOLUME /buildkite
