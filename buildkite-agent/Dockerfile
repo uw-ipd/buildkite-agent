@@ -28,6 +28,9 @@ RUN curl -O https://download.docker.com/linux/ubuntu/dists/xenial/pool/stable/am
 RUN curl -Lfs https://github.com/docker/compose/releases/download/1.21.0/docker-compose-Linux-x86_64 -o /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/docker-compose
 
+### Install admin tools
+RUN apt-get update && apt-get install -y --no-install-recommends vim-tiny
+
 ### Install conda
 ENV PATH /opt/conda/bin:$PATH
 

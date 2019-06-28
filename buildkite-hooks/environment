@@ -1,9 +1,11 @@
 #!/bin/bash
 
+rm /ssh_auth_sock
+
 export SSH_AUTH_SOCK=/ssh_auth_sock
+ssh-agent -a $SSH_AUTH_SOCK
 
 (
   set +e
-  ssh-agent -a $SSH_AUTH_SOCK
   ssh-add /buildkite-secrets/*.id_rsa
 )
