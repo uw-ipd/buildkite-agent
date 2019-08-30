@@ -7,11 +7,11 @@ IFS=$'\n\t'
 set -x
 
 
-BUILDKITE_HOST=`hostname -f`
-DOCKER_VERSION=`docker version --format "{{.Server.Version}}"`
-NVIDIA_DOCKER_VERSION=`nvidia-docker version | grep "NVIDIA Docker:" | sed -e "s/NVIDIA Docker: //"`
+export BUILDKITE_HOST=`hostname -f`
+export DOCKER_VERSION=`docker version --format "{{.Server.Version}}"`
+export NVIDIA_DOCKER_VERSION=`nvidia-docker version | grep "NVIDIA Docker:" | sed -e "s/NVIDIA Docker: //"`
 
-NVIDIA_DEVICE=$(
+export NVIDIA_DEVICE=$(
     set +e
     smi_result=`nvidia-smi --query-gpu=name -i 0 --format=csv,noheader`
     if [ $? -eq 0 ]; then
